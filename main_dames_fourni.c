@@ -451,23 +451,44 @@ void remplis_echiquier ( void ) // DONE
     {
          for(ligne=0;ligne<3;ligne++) // Remplis de la ligne 1 à 3
         {
-            if(ligne%2==1 || ligne==0)//Si sur ligne paire/0
-                colonne=0;             // On commence à la colonne 0
-            else
-                colonne=1;              // on commence à la colonne 1
-            for(compteur=0;compteur<5;compteur++;){ // Mets 5 pions sur la ligne
+            if(ligne%2==1 || ligne==0){//Si sur ligne paire/0
+                    // On commence à la colonne 0
+                for(compteur=0;compteur<5;compteur++;){ // Mets 5 pions sur la ligne
+                remplis_case(ligne,colonne,PionBL);
+                remplis_case(ligne,colonne+1,RIEN);
+                colonne+2;}
+            }                           // on commence à la colonne 1
+            else{
+                    // On commence à la colonne 0
+                for(compteur=0;compteur<5;compteur++;){ // Mets 5 pions sur la ligne
+                remplis_case(ligne,colonne-1,RIEN);
                 remplis_case(ligne,colonne,PionBL);
                 colonne+2;}
+            }
+            colonne=0;
+         }
+         for(ligne=4;ligne<6;ligne++){
+            for(compteur=0;compteur<N;compteur++;){ // Mets 5 pions sur la ligne
+                remplis_case(ligne,colonne,RIEN);
+                colonne++;}
          }
          for(ligne=6;ligne<(N-1);ligne++) // Remplis de la ligne 6 à 9
          {
-            if(ligne%2==1)
-                colonne=0;
-            else
-                colonne=1;
-            for(compteur=0;compteur<5;compteur++;){
-                remplis_case(ligne,colonne,PionNO);
+            if(ligne%2==1){//Si sur ligne paire/0
+                           // On commence à la colonne 0
+                for(compteur=0;compteur<5;compteur++;){ // Mets 5 pions sur la ligne
+                remplis_case(ligne,colonne,PionBL);
+                remplis_case(ligne,colonne+1,RIEN);
                 colonne+2;}
+            }                           // on commence à la colonne 1
+            else{
+                           // On commence à la colonne 0
+                for(compteur=0;compteur<5;compteur++;){ // Mets 5 pions sur la ligne
+                remplis_case(ligne,colonne-1,RIEN);
+                remplis_case(ligne,colonne,PionBL);
+                colonne+2;}
+            }
+            colonne=0;
          }
 
     }
