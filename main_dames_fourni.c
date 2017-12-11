@@ -122,6 +122,9 @@ void print_echiquier ( void ) ;
 void print_echiquier_ligne ( int li ) ;
 void print_echiquier_colonnes ( int li ) ;
 void print_line ( char separator_char , char fill_char ) ;
+void print_contenu(int contenu);
+int contenu_case(int lig, int col);
+
 
 void affiche ( int prise_ou_non , int li , int co , int piece , int liar , int coar , int piecear ,
                int lipr , int copr , int piecepr , int prof ) ;
@@ -446,73 +449,67 @@ void main_petit_test ( int prof )
 
 void remplis_echiquier ( void ) // DONE
 {
-      int ligne=0,colonne=0,compteur=0; // don't forget on commence ligne 0
-      if(N==10)
-    {
-         for(ligne=0;ligne<3;ligne++) // Remplis de la ligne 1 à 3
-        {
-            if(ligne%2==1 || ligne==0){//Si sur ligne paire/0
-                    // On commence à la colonne 0
-                for(compteur=0;compteur<5;compteur++;){ // Mets 5 pions sur la ligne
-                remplis_case(ligne,colonne,PionBL);
-                remplis_case(ligne,colonne+1,RIEN);
-                colonne+2;}
-            }                           // on commence à la colonne 1
-            else{
-                    // On commence à la colonne 0
-                for(compteur=0;compteur<5;compteur++;){ // Mets 5 pions sur la ligne
-                remplis_case(ligne,colonne-1,RIEN);
-                remplis_case(ligne,colonne,PionBL);
-                colonne+2;}
-            }
-            colonne=0;
-         }
-         for(ligne=4;ligne<6;ligne++){
-            for(compteur=0;compteur<N;compteur++;){ // Mets 5 pions sur la ligne
-                remplis_case(ligne,colonne,RIEN);
-                colonne++;}
-         }
-         for(ligne=6;ligne<(N-1);ligne++) // Remplis de la ligne 6 à 9
-         {
-            if(ligne%2==1){//Si sur ligne paire/0
-                           // On commence à la colonne 0
-                for(compteur=0;compteur<5;compteur++;){ // Mets 5 pions sur la ligne
-                remplis_case(ligne,colonne,PionBL);
-                remplis_case(ligne,colonne+1,RIEN);
-                colonne+2;}
-            }                           // on commence à la colonne 1
-            else{
-                           // On commence à la colonne 0
-                for(compteur=0;compteur<5;compteur++;){ // Mets 5 pions sur la ligne
-                remplis_case(ligne,colonne-1,RIEN);
-                remplis_case(ligne,colonne,PionBL);
-                colonne+2;}
-            }
-            colonne=0;
-         }
+    int ligne=0,colonne=0,compteur=0; // don't forget on commence ligne 0
+    int ligne_max_basse=(N/2-1),ligne_mediane;
+    if(N==10)
+        ligne_mediane=N-4;
+    else
+        ligne_mediane=N-3;
 
-    }
-    if(N==8){ //Pareil mais pour un terrain 8x8
-        for(ligne=0;ligne<2;ligne++)
+    for (ligne=0;ligne<=ligne_max_basse;ligne++)
+    {
+        if(colonne==(N-1))
         {
-            if(ligne%2==1 || ligne==0)
-                colonne=0;
-            else
-                colonne=1;
-            for(compteur=0;compteur<4;compteur++;){
+            while(compteur<5)
+            {
                 remplis_case(ligne,colonne,PionBL);
-                colonne+2;}
-         }
-         for(ligne=5;ligne<(N-1);ligne++) // N=10, on va jusqu'à 9
-         {
-            if(ligne%2==1)
-                colonne=0;
-            else
-                colonne=1;
-            for(compteur=0;compteur<4;compteur++;){
-                remplis_case(ligne,colonne,PionNO);
-                colonne+2;}
-         }
+                colonne--;
+                remplis_case(ligne,colonne,RIEN);
+                colonne--;
+                compteur++;
+            }
+        }
+        if(colonne==0)
+        {
+            while(compteur<5)
+            {
+                remplis_case(ligne,colonne,PionBL);
+                colonne++;
+                remplis_case(ligne,colonne,RIEN);
+                colonne++;compteur++;
+            }
+        }
+        compteur=0;
+    }
+    for(ligne=ligne_max_basse;ligne=ligne_mediane;ligne++)
+    {
+            for(compteur=0;compteur<10;compteur++)
+                {remplis_case(ligne,colonne,RIEN);}
+            colonne=0;
+    }
+    for(ligne=ligne_mediane;ligne=(N-1);ligne++)
+    {
+        if(colonne==(N-1))
+        {
+            while(compteur<5)
+            {
+                remplis_case(ligne,colonne,PionBL);
+                colonne--;
+                remplis_case(ligne,colonne,RIEN);
+                colonne--;
+                compteur++;
+            }compteur=0;
+        }
+        if(colonne==0)
+        {
+            while(compteur<5)
+            {
+                remplis_case(ligne,colonne,PionBL);
+                colonne++;
+                remplis_case(ligne,colonne,RIEN);
+                colonne++;compteur++;
+            }compteur=0;
+        }
     }
 }
 
@@ -629,44 +626,95 @@ void joue_mouv ( tmm m )
 
 /* L'impression de l'échiquier est faite à l'aide de print_echiquier */
 
-void print_echiquier ( void )
+void print_echiquier ( void ) // print toutes les lignes de l'échiquier une par une
      {
-
+        int ligne=0;
+        for(ligne=(N-1);ligne>=0;ligne--)
+        {
+            print_echiquier_ligne(ligne);
+        }
      }
 
+int contenu_case(int lig, int col) // Retourne le contenu d'une case de l'echiquier
+{
+    return T[lig][col];
+}
+
+void print_contenu(int contenu) // Printf le contenu d'une case avec les lettres associées aux pions
+{
+    switch(contenu)
+        {
+            case(DameBL):
+                printf("B");
+                break;
+            case(DameNO):
+                printf("N");
+                break;
+            case(PionBL):
+                printf("b");
+                break;
+            case(PionNO):
+                printf("n");
+                break;
+            case(RIEN):
+                printf(" ");
+                break;
+        }
+}
 /* print_echiquier_ligne ( <numéro> ) affiche une ligne de l'échiquier, comme par exemple :
 
+
+
+*/
+/* On print les lignes de haut en bas, càd à par exemple comme ça :
+   |-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
    |     |     |     |     |     |     |     |     |     |     |
  2 |     |     |  b  |     |     |     |  b  |     |  b  |     |
    |     |     |     |     |     |     |     |     |     |     |
-   |-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
 
 */
 
-int contenu_case(int ligne, int colonne)
-{
-
-
-}
 
 void print_echiquier_ligne ( int li )
-     {
-         for(i=0;i<NMAX-1;i++)
-         {
-             if(est)
-             printf("|")
-         }
-     }
+{
+     int colonne_max=N-1,sous_ligne=0,contenu=0;
+     int colonne=0,ligne=0;
 
+    for(sous_ligne=0;sous_ligne<4;sous_ligne++) // printer 4 sous ligne pour une case
+    {
+        if(sous_ligne==0) // printf la ligne du haut, la première et qui est différente des autres
+            print_line('+','-');
+
+        else if(sous_ligne==2) // printf la ligne avec les pions.
+            print_echiquier_colonnes(li);
+
+        else // print les sous lignes où il n'y a pas de pions.
+            print_line('|',' ');
+
+        sous_ligne++;
+    }
+    if(li==0) // Si on est à la ligne 0 on a besoin d'une ligne de bord en bas
+    {
+        print_line('+','-');
+    }
+
+}
 /* print_echiquier_colonne ( <numéro> ) affiche une ligne physique, comme par exemple :
 
  2 |     |     |  b  |     |     |     |  b  |     |  b  |     |
 
 */
-
+// le petit frère de print ligne, il n'affiche que la ligne avec le contenu
 void print_echiquier_colonnes ( int li )
      {
-
+        printf(" %d ",li);
+        int colonne=0;
+        for(colonne=0;colonne<(N-1);colonne++)
+        {
+            printf("|  ");
+            print_contenu(T[li][colonne]);
+            printf("  ");
+        }printf("|\n");
      }
 
 /* print_line( '|' , ' ' ) ou print_line( '+' , '-' ) affichent, par exemple :
@@ -680,9 +728,19 @@ ou
 */
 
 void print_line ( char separator_char , char fill_char )
+{
+     int i=0;
+     printf("   ");
+     for(i=0;i<(N-1);i++)
      {
-
-     }
+         if(i==0)
+            printf("|%c%c%c%c",fill_char,fill_char,fill_char,fill_char);
+         else if(i==(N-1))
+            printf("%c%c%c%c|",fill_char,fill_char,fill_char,fill_char);
+         else
+            printf("%c%c%c%c%c", separator_char,fill_char,fill_char,fill_char,fill_char);
+     }printf("%c\n",separator_char);
+}
 
 /* --D--autres--fonctions--d--impression----------------------------------------------------------------------------- */
 
@@ -779,8 +837,129 @@ int prise_possible_toutes ( int li , int co , int coul )
    à distance 1, mais une dame pourra prendre des pièces à d'autres distances. */
 
 int prise_possible_case ( int li , int co , int coul , int sens , int direct )
+{
+    int piece=contenu_case(li,co);
+    int i=0,compteur=0;
+    if(coul==BLANC) // COTE BLANC
     {
+        if(sens==AVANT)// PRISE AVANT
+        {
+            if(piece==PionBL)
+            {
+                if(li<=(N-2) && (co>=1 && co <=(N-2))) // Si on est dans La partie où on peut prendre
+                {
+                    if(direct==DROITE && contenu_case((li+1),(co+1))==PionNO || contenu_case((li+1),(co+1))==DameNO) // ON PRENDS A DIAGONALE AVANT DROITE
+                    {
+                        if(contenu_case((li+2),(co+2))==RIEN)
+                            return compteur++; // On peut prendre à 1 de distance
+                    }
+                    else if(direct==GAUCHE && contenu_case((li+1),(co-1))==PionNO || contenu_case((li+1),(co-1))==DameNO)// ON PRENDS DIAGONALE AVANT GAUCHE
+                    {
+                        if(contenu_case((li+2),(co-2))==RIEN)
+                            return compteur++;
+                    }
+                }
+                return 0;
+            }
+            else// DameBL
+            {
+                if(direct=DROITE && li<=(N-2) && (co>=1 && co <=(N-2))) // Si on est dans La partie où on peut prendre
+                {
+                    while(contenu_case(li+1,co+1)==RIEN && (li<=(N-2) && (co>=1 && co <=(N-2)))) // continue jusqu'à être au bord de la zone de prise
+                    {
+                        compteur++;
+                        li++;
+                        co++;
+                    }// Stop si on trouve un pion
+                    if((contenu_case(li,co)==PionNO || contenu_case(li,co)==DameNO)  && contenu_case(li+1,co+1)==RIEN) // vérifie la dernière case derrière le pion
+                        return compteur;
+                    else //
+                        return 0;
+                }
+                else if(direct=GAUCHE && li<=(N-2) && (co>=1 && co <=(N-2))) // Si on est dans La partie où on peut prendre
+                {
+                    while(contenu_case(li+1,co-1)==RIEN && (li<=(N-2) && (co>=1 && co <=(N-2))))
+                    {
+                        compteur++;
+                        li++;
+                        co++;
+                    }// Stop au bout de la zone de capture/quand on trouve un pion
+                    if((contenu_case(li,co)==PionNO || contenu_case(li,co)==DameNO) && contenu_case(li+1,co+1)==RIEN) // si notre case au bord/case avec pion
+                        // a une case vide derrière elle, on renvoie le compteur
+                        return compteur;
+                    else
+                        return 0;
+                }
+            }
+        }
+
+
+
+
+
+
+        else // PRISE ARRIERE                   A FINIR + VERIFIER LES < OU <=
+        {
+            if(piece==PionBL)
+            {
+                if(li>1 && (co>1 && co <(N-2))) // Si on est dans La partie où on peut prendre
+                {
+                    if(direct==DROITE && (contenu_case((li-1),(co+1))==PionNO || contenu_case((li+1),(co+1))==DameNO)) // ON PRENDS A DIAGONALE DROITE
+                    {
+                        if(contenu_case((li-2),(co+2))==RIEN)
+                            return compteur++; // On peut prendre à 1 de distance
+                    }
+                }
+                else if(li>1 && co>1)
+                {
+                  else if(direction==GAUCHE && contenu_case(li-1,co-1)==PionNO || contenu_case(li-1,co-1)==DameNO)// ON PRENDS DIAGONALE GAUCHE
+                    {
+                        if(contenu_case((li-2),(co-2))==RIEN)
+                            return compteur++;
+                    }
+                }
+                return 0;
+            }
+
+        }
+            else// DameBL
+            {   // Arrière Droite
+                if(direct==DROITE && li>1 &&  (co<(N-2))) // Si on est dans La partie où on peut prendre
+                {
+                    while(contenu_case(li-1,co+1)==RIEN && (li>1) && (co <(N-2))) // continue jusqu'à être au bord de la zone de prise
+                    {
+                        compteur++;
+                        li++;
+                        co++;
+                    }// Stop si on trouve un pion
+                    if((contenu_case(li,co)==PionNO || contenu_case(li,co)==DameNO)  && contenu_case(li+1,co+1)==RIEN) // vérifie la dernière case derrière le pion
+                        return compteur;
+                    else //
+                        return 0;
+                }
+                else if(direct==GAUCHE && li<(N-2) && co>=1) // Si on est dans La partie où on peut prendre
+                {
+                    while(contenu_case(li+1,co-1)==RIEN && (li<=(N-2) && (co>=1 && co <=(N-2))))
+                    {
+                        compteur++;
+                        li++;
+                        co++;
+                    }// Stop au bout de la zone de capture/quand on trouve un pion
+                    if((contenu_case(li,co)==PionNO || contenu_case(li,co)==DameNO) && contenu_case(li+1,co+1)==RIEN) // si notre case au bord/case avec pion
+                        // a une case vide derrière elle, on renvoie le compteur
+                        return compteur;
+                    else
+                        return 0;
+                }
+            }
+        }
     }
+    else // COTE NOIR
+    {
+
+
+    }
+}
 
 /* --Le--test--de--cases--vides-------------------------------------------------------------------------------------- */
 
@@ -792,7 +971,60 @@ int prise_possible_case ( int li , int co , int coul , int sens , int direct )
 
 int cases_vides ( int li , int co , int num , int coul , int sens , int direct )
     {
-
+        int i=0,compteur_vide=0;
+        if(sens=AVANT)
+        {
+            if(direct=DROITE)
+            {
+                for(i=0;i<num;i++)
+                {
+                    li++;co++;
+                    assert(li>=N);assert(co>=N);
+                    if(contenu_case(li,co)==RIEN)
+                        compteur_vide++;
+                }
+            }
+            else
+            {
+                for(i=0;i<num;i++)
+                {
+                    li++;co--;
+                    assert(li>=N);
+                    assert(co<0);
+                    if(contenu_case(li,co)==RIEN)
+                        compteur_vide++;
+                }
+            }
+        }
+        else
+        {
+            if(direct=DROITE)
+            {
+                for(i=0;i<num;i++)
+                {
+                    li--;co++;
+                    assert(li<0);
+                    assert(co>=N);
+                    if(contenu_case(li,co)==RIEN)
+                        compteur_vide++;
+                }
+            }
+            else
+            {
+                for(i=0;i<num;i++)
+                {
+                    li--;co--;
+                    assert(li<0);
+                    assert(co<0);
+                    if(contenu_case(li,co)==RIEN)
+                        compteur_vide++;
+                }
+            }
+        }
+        if(compteur_vide==num)
+            return 1;
+        else
+            return 0;
     }
 
 /* --La--boucle--de--jeu--principale--------------------------------------------------------------------------------- */
