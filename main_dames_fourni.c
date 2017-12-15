@@ -166,7 +166,10 @@ int effectue_depl_sans_prise ( int lidp , int codp , int piece , int coul , int 
    principe que le programmeur saura mettre en place un dialogue avec l'utilisateur. */
 
 int main ( int argc , char * argv[ ] )
-    {if ( argc <= 1 )
+    {N=10;
+      remplis_echiquier( ) ;
+      print_echiquier();
+      if ( argc <= 1 )
         {N = 10 ;
          main_test_prise( ) ;
          main_bouge_sans_prise( ) ;
@@ -187,7 +190,7 @@ int main ( int argc , char * argv[ ] )
             else
                coul_ordi = NOIR ;
             if ( ( N == 8 || N == 10 ) && ( 0 < prof && prof < PROF ) )
-               {(void)printf( "L'échiquier est de taille %d et l'ordo joue les " , N ) ;
+               {(void)printf( "L'échiquier est de taille %d et l'ordi joue les " , N ) ;
                 (void)printf( "%s. La profondeur de recherche est de %d.\n" , texte[ coul_ordi + 1 ] , prof ) ;
                 remplis_echiquier( ) ;
                 itere_jeu( coul_ordi , prof ) ;
@@ -450,17 +453,13 @@ void main_petit_test ( int prof )
 void remplis_echiquier ( void ) // DONE
 {
     int ligne=0,colonne=0,compteur=0; // don't forget on commence ligne 0
-    int ligne_max_basse=(N/2-1),ligne_mediane;
-    if(N==10)
-        ligne_mediane=N-4;
-    else
-        ligne_mediane=N-3;
+    int ligne_max_basse=(N/2)-1,ligne_mediane=(N/2)+1;
 
-    for (ligne=0;ligne<=ligne_max_basse;ligne++)
+    for (ligne=0;ligne<ligne_max_basse;ligne++)
     {
         if(colonne==(N-1))
         {
-            while(compteur<5)
+            while(compteur< N/2)
             {
                 remplis_case(ligne,colonne,PionBL);
                 colonne--;
@@ -471,7 +470,7 @@ void remplis_echiquier ( void ) // DONE
         }
         if(colonne==0)
         {
-            while(compteur<5)
+            while(compteur<N/2)
             {
                 remplis_case(ligne,colonne,PionBL);
                 colonne++;
@@ -483,15 +482,15 @@ void remplis_echiquier ( void ) // DONE
     }
     for(ligne=ligne_max_basse;ligne=ligne_mediane;ligne++)
     {
-            for(compteur=0;compteur<10;compteur++)
-                {remplis_case(ligne,colonne,RIEN);}
+            for(compteur=0;compteur<N;compteur++)
+                  remplis_case(ligne,colonne,RIEN);
             colonne=0;
     }
     for(ligne=ligne_mediane;ligne=(N-1);ligne++)
     {
         if(colonne==(N-1))
         {
-            while(compteur<5)
+            while(compteur<N/2)
             {
                 remplis_case(ligne,colonne,PionBL);
                 colonne--;
@@ -502,7 +501,7 @@ void remplis_echiquier ( void ) // DONE
         }
         if(colonne==0)
         {
-            while(compteur<5)
+            while(compteur<N/2)
             {
                 remplis_case(ligne,colonne,PionBL);
                 colonne++;
@@ -838,7 +837,7 @@ int prise_possible_toutes ( int li , int co , int coul )
 
 int prise_possible_case ( int li , int co , int coul , int sens , int direct )
 {
-    int piece=contenu_case(li,co);
+  /*  int piece=contenu_case(li,co);
     int i=0,compteur=0;
     if(coul==BLANC) // COTE BLANC
     {
@@ -958,7 +957,7 @@ int prise_possible_case ( int li , int co , int coul , int sens , int direct )
     {
 
 
-    }
+    }*/
 }
 
 /* --Le--test--de--cases--vides-------------------------------------------------------------------------------------- */
