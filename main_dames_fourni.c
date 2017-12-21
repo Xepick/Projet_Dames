@@ -767,29 +767,17 @@ void print_mouvement ( int prof , int indent )
 void print_mouv ( tmm m[ PRISE ] , int indent )
      {
         int i, prise = 0;
-        char * Str;
 
         for(i = 0; i < indent; i++)
             printf(" ");
-
-        switch (m[0].piece) {
-          case PionBL:
-            Str = "du pion blanc";
-            break;
-
-          case PionNO:
-            Str = "du pion noir";
-            break;
-
-          case DameBL:
-            Str = "de la dame blanche";
-            break;
-
-          case DameNO:
-            Str = "de la dame noire";
-            break;
-        }
-        printf("Le mouvement %c va\n",Str);
+        if (m[0].piece == PionBL)
+          printf("Le mouvement du pion blanc va\n");
+        else if (m[0].piece == PionNO)
+          printf("Le mouvement du pion noir va\n");
+        else if (m[0].piece == DameBL)
+          printf("Le mouvement de la dame blanche va\n");
+        else if (m[0].piece == DameNO)
+          printf("Le mouvement de la dame noire va\n");
 
         while(prise < PRISE && m[prise].piece != RIEN) // on sort si on a plus de mouvement avec la piece ou si fin du tableau
         {
@@ -798,14 +786,11 @@ void print_mouv ( tmm m[ PRISE ] , int indent )
           printf("    ");
           printf("de ( %d , %d ) à ( %d , %d )", m[prise].li, m[prise].co, m[prise].liar, m[prise].coar);
 
-          switch (abs(m[prise].piecepr)) {
-            case 1:
+          if (abs(m[prise].piecepr) == 1)
               printf(" et prise de pion en ( %d , %d )", m[prise].lipr, m[prise].copr);
-              break;
-            case 2:
+          else if(abs(m[prise].piecepr) == 2)
               printf(" et prise de dame en ( %d , %d )", m[prise].lipr, m[prise].copr);
-              break;
-          }
+
           if (m[prise].piece != m[prise].piecear)
               printf(" avec promotion dame");
           printf("\n");
@@ -821,13 +806,33 @@ void print_mouv ( tmm m[ PRISE ] , int indent )
 
 int prise_possible_avant ( int coul )
     {
+      int ligne=0,colonne=0;
+      for(ligne=0;ligne<=(N-1);ligne++)
+        for(colonne=0;colonne<=(N-1);colonne++)
+            if(est_pion(ligne,colonne,coul))
+              if(prise_possible_case(ligne,colonne,coul,AVANT,DROITE)==1 || prise_possible_case(ligne,colonne,coul,AVANT,GAUCHE)==1)
+                return 1;
+            else if(est_dame(ligne,colonne,coul))
+              if((prise_possible_case(ligne,colonne,coul,AVANT,DROITE)!=0) || (prise_possible_case(ligne,colonne,coul,AVANT,GAUCHE)!=0))
+                  return 1;
+              else if(prise_possible_case(ligne,colonne,coul,ARRIERE,DROITE)!=0 || prise_possible_case(ligne,colonne,coul,ARRIERE,GAUCHE)!=0)
+                return 1;
+      return 0;
     }
 
-/* On teste toutes les possibités de prise à partir du peint de départ. */
+/* On teste toutes les possibités de prise à partir du point de départ. */
 
-int prise_possible_toutes ( int li , int co , int coul )
-    {
-    }
+  int prise_possible_toutes ( int li , int co , int coul )
+  {
+    int prise_possible = prise_possible_case(li, co, coul, AVANT, GAUCHE);
+    if( prise_possible == NON )
+        prise_possible = prise_possible_case(li, co, coul, AVANT, DROITE);
+    if( prise_possible == NON )
+        prise_possible = prise_possible_case(li, co, coul, ARRIERE, GAUCHE);
+    if( prise_possible == NON )
+        prise_possible = prise_possible_case(li, co, coul, ARRIERE, DROITE);
+    return (prise_possible != 0);
+  }
 
 /* prise_possible_case reçoit les coordonnées li et co d'une pièce de la couleur coul. On peut avoir affaire à une
    dame ou un pion. sens peut valoir AVANT ou ARRIERE et direct GAUCHE ou DROITE. Cette fonction est appelée par les
@@ -846,127 +851,36 @@ int prise_possible_toutes ( int li , int co , int coul )
 
 int prise_possible_case ( int li , int co , int coul , int sens , int direct )
 {
-  /*  int piece=contenu_case(li,co);
+  int piece=contenu_case(li,co);
     int i=0,compteur=0;
-    if(coul==BLANC) // COTE BLANC
-    {
-        if(sens==AVANT)// PRISE AVANT
-        {
-            if(piece==PionBL)
+      if(piece*coul==1)
+      {
+        if(contenu_case((li+sens*coul),(co+coul*direct))*(-coul)==1 || contenu_case((li+sens*coul),(co+coul*direct))*(-coul)==2)
+            if(contenu_case((li+2*sens*coul),(co+2*coul*direct))==RIEN)
+               return compteur+1; // On peut prendre à 1 de distance
+        return 0;
+      }
+      else// DameBL
+      { // changer li<(N-2)
+        if(li>1 && li <(N-2) && co>1 && co<(N-2)) // Si on est dans La partie où on peut prendre
+          {
+            while(contenu_case((li+sens*coul),(co+coul*direct))==RIEN && li>1 && li<(N-2) && co>1 && co<(N-2)) // continue jusqu'à être au bord de la zone de prise
             {
-                if(li<=(N-2) && (co>=1 && co <=(N-2))) // Si on est dans La partie où on peut prendre
-                {
-                    if(direct==DROITE && contenu_case((li+1),(co+1))==PionNO || contenu_case((li+1),(co+1))==DameNO) // ON PRENDS A DIAGONALE AVANT DROITE
-                    {
-                        if(contenu_case((li+2),(co+2))==RIEN)
-                            return compteur++; // On peut prendre à 1 de distance
-                    }
-                    else if(direct==GAUCHE && contenu_case((li+1),(co-1))==PionNO || contenu_case((li+1),(co-1))==DameNO)// ON PRENDS DIAGONALE AVANT GAUCHE
-                    {
-                        if(contenu_case((li+2),(co-2))==RIEN)
-                            return compteur++;
-                    }
-                }
-                return 0;
-            }
-            else// DameBL
-            {
-                if(direct=DROITE && li<=(N-2) && (co>=1 && co <=(N-2))) // Si on est dans La partie où on peut prendre
-                {
-                    while(contenu_case(li+1,co+1)==RIEN && (li<=(N-2) && (co>=1 && co <=(N-2)))) // continue jusqu'à être au bord de la zone de prise
-                    {
-                        compteur++;
-                        li++;
-                        co++;
-                    }// Stop si on trouve un pion
-                    if((contenu_case(li,co)==PionNO || contenu_case(li,co)==DameNO)  && contenu_case(li+1,co+1)==RIEN) // vérifie la dernière case derrière le pion
-                        return compteur;
-                    else //
-                        return 0;
-                }
-                else if(direct=GAUCHE && li<=(N-2) && (co>=1 && co <=(N-2))) // Si on est dans La partie où on peut prendre
-                {
-                    while(contenu_case(li+1,co-1)==RIEN && (li<=(N-2) && (co>=1 && co <=(N-2))))
-                    {
-                        compteur++;
-                        li++;
-                        co++;
-                    }// Stop au bout de la zone de capture/quand on trouve un pion
-                    if((contenu_case(li,co)==PionNO || contenu_case(li,co)==DameNO) && contenu_case(li+1,co+1)==RIEN) // si notre case au bord/case avec pion
-                        // a une case vide derrière elle, on renvoie le compteur
-                        return compteur;
-                    else
-                        return 0;
-                }
-            }
-        }
-
-
-
-
-
-
-        else // PRISE ARRIERE                   A FINIR + VERIFIER LES < OU <=
-        {
-            if(piece==PionBL)
-            {
-                if(li>1 && (co>1 && co <(N-2))) // Si on est dans La partie où on peut prendre
-                {
-                    if(direct==DROITE && (contenu_case((li-1),(co+1))==PionNO || contenu_case((li+1),(co+1))==DameNO)) // ON PRENDS A DIAGONALE DROITE
-                    {
-                        if(contenu_case((li-2),(co+2))==RIEN)
-                            return compteur++; // On peut prendre à 1 de distance
-                    }
-                }
-                else if(li>1 && co>1)
-                {
-                  else if(direction==GAUCHE && contenu_case(li-1,co-1)==PionNO || contenu_case(li-1,co-1)==DameNO)// ON PRENDS DIAGONALE GAUCHE
-                    {
-                        if(contenu_case((li-2),(co-2))==RIEN)
-                            return compteur++;
-                    }
-                }
-                return 0;
-            }
-
-        }
-            else// DameBL
-            {   // Arrière Droite
-                if(direct==DROITE && li>1 &&  (co<(N-2))) // Si on est dans La partie où on peut prendre
-                {
-                    while(contenu_case(li-1,co+1)==RIEN && (li>1) && (co <(N-2))) // continue jusqu'à être au bord de la zone de prise
-                    {
-                        compteur++;
-                        li++;
-                        co++;
-                    }// Stop si on trouve un pion
-                    if((contenu_case(li,co)==PionNO || contenu_case(li,co)==DameNO)  && contenu_case(li+1,co+1)==RIEN) // vérifie la dernière case derrière le pion
-                        return compteur;
-                    else //
-                        return 0;
-                }
-                else if(direct==GAUCHE && li<(N-2) && co>=1) // Si on est dans La partie où on peut prendre
-                {
-                    while(contenu_case(li+1,co-1)==RIEN && (li<=(N-2) && (co>=1 && co <=(N-2))))
-                    {
-                        compteur++;
-                        li++;
-                        co++;
-                    }// Stop au bout de la zone de capture/quand on trouve un pion
-                    if((contenu_case(li,co)==PionNO || contenu_case(li,co)==DameNO) && contenu_case(li+1,co+1)==RIEN) // si notre case au bord/case avec pion
-                        // a une case vide derrière elle, on renvoie le compteur
-                        return compteur;
-                    else
-                        return 0;
-                }
-            }
-        }
-    }
-    else // COTE NOIR
-    {
-
-
-    }*/
+              compteur=compteur+1;
+              li=li+coul*sens;
+              co=co+coul*direct;
+            }// Stop si on trouve un pion
+            li=li+coul*sens;
+            co=co+coul*direct;
+            compteur=compteur+1;
+            if(contenu_case(li,co)*(-coul)==1 || contenu_case(li,co)*(-coul)==2)
+              {
+                if(contenu_case((li+sens*coul),(co+coul*direct))==RIEN && (li<=(N-1) && li>=0 && co<=(N-1) && co>=0))   // vérifie la dernière case derrière le pion
+                  return compteur;
+              }
+          }
+        return 0;
+      }
 }
 
 /* --Le--test--de--cases--vides-------------------------------------------------------------------------------------- */
@@ -979,60 +893,18 @@ int prise_possible_case ( int li , int co , int coul , int sens , int direct )
 
 int cases_vides ( int li , int co , int num , int coul , int sens , int direct )
     {
-        int i=0,compteur_vide=0;
-        if(sens=AVANT)
-        {
-            if(direct=DROITE)
-            {
-                for(i=0;i<num;i++)
-                {
-                    li++;co++;
-                    assert(li>=N);assert(co>=N);
-                    if(contenu_case(li,co)==RIEN)
-                        compteur_vide++;
-                }
-            }
-            else
-            {
-                for(i=0;i<num;i++)
-                {
-                    li++;co--;
-                    assert(li>=N);
-                    assert(co<0);
-                    if(contenu_case(li,co)==RIEN)
-                        compteur_vide++;
-                }
-            }
-        }
-        else
-        {
-            if(direct=DROITE)
-            {
-                for(i=0;i<num;i++)
-                {
-                    li--;co++;
-                    assert(li<0);
-                    assert(co>=N);
-                    if(contenu_case(li,co)==RIEN)
-                        compteur_vide++;
-                }
-            }
-            else
-            {
-                for(i=0;i<num;i++)
-                {
-                    li--;co--;
-                    assert(li<0);
-                    assert(co<0);
-                    if(contenu_case(li,co)==RIEN)
-                        compteur_vide++;
-                }
-            }
-        }
-        if(compteur_vide==num)
-            return 1;
-        else
-            return 0;
+      int nb_cases_vides = 0, case_vide = OUI, cpt_cases = 1;
+      if( (li + num*coul*sens >= N || li + num*coul*sens < 0) || ( co + num*coul*direct >= N || co + num*coul*direct < 0 ))
+          case_vide = NON;
+      else
+          while( case_vide && nb_cases_vides < num) {
+              if( T[li + cpt_cases*coul*sens][co + cpt_cases*coul*direct] == RIEN )
+                  nb_cases_vides++;
+              else
+                  case_vide = NON;
+              cpt_cases++;
+          }
+      return case_vide;
     }
 
 /* --La--boucle--de--jeu--principale--------------------------------------------------------------------------------- */
@@ -1107,6 +979,47 @@ int suite_ou_pas ( void )
 int analyse_mouvement ( int dep , int arr , int prise_ou_pas , int couleur , int * num_mouv ,
                         tmm depl[ PRISE ] , int * suite , int * lisuite , int * cosuite )
     {
+      int mouvement_autoriser = OUI;
+
+      int depLi = dep / 10;
+      int depCo = dep % 10;
+      int arrLi = arr / 10;
+      int arrCo = arr % 10;
+
+     if ( (arrLi - depLi != arrCo - depCo) && (arrLi - depLi != -(arrCo - depCo)) )// les coordonnées sont sur des diagonales différentes
+         mouvement_autoriser = NON;
+
+     if(mouvement_autoriser && T[depLi][depCo] == RIEN)
+         mouvement_autoriser = NON;
+
+     if(mouvement_autoriser && T[arrLi][arrCo] != RIEN)
+         mouvement_autoriser = NON;
+
+     int pieceArr = T[depLi][depCo];
+     if(mouvement_autoriser && T[depLi][depCo]*couleur == 1 && arrLi == (couleur == BLANC ? N-1 : 0) )
+         pieceArr = (couleur == BLANC ? DameBL : DameNO);
+
+     if(mouvement_autoriser) {
+         if (! prise_ou_pas) {
+             memo ( depl , MOUV_SANS_PRISE , *num_mouv , depLi , depCo , T[depLi][depCo] , arrLi , arrCo , pieceArr , RIEN , RIEN, RIEN ) ;
+             joue_mouv(depl[0]);
+         }
+         else {
+             int newPrise = prise_possible_toutes(arrLi, arrCo, couleur);
+             if(newPrise != 0) {
+                 *suite = OUI;
+                 *lisuite = arrLi+newPrise;
+                 *cosuite = arrCo+newPrise;
+                 mouvement_autoriser = NON;
+                 *num_mouv++;
+             }
+             int liPr = arrLi-1*(depLi < arrLi ? 1 : -1);
+             int coPr = arrCo-1*(depCo < arrCo ? 1 : -1);
+             memo ( depl , MOUV_AVEC_PRISE , *num_mouv , depLi , depCo , T[depLi][depCo] , arrLi , arrCo , pieceArr , liPr , coPr, T[liPr][coPr]) ;
+             joue_mouv(depl[*num_mouv]);
+         }
+     }
+     return mouvement_autoriser;
     }
 
 /* Un camp a perdu s'il ne peut plus bouger aucune pièce. */
@@ -1305,6 +1218,25 @@ int cherche_depl_avec_prise ( int li , int co , int piece , int coul , int numBL
 int effectue_depl_avec_prise ( int li , int co , int piece , int coul , int lipr , int copr , int liar , int coar ,
                                int numBL , int numNO , int prof , int minmax , int num_mouv , tmm m[ PROF ][ PRISE ] )
     {
+      int ancPiece = piece; // sauvegarde l'ancienne valeur
+      int piecepr = T[lipr][copr];
+      remplis_case(li,co,RIEN);
+      remplis_case(lipr,copr,RIEN);
+
+      if( piece*coul == 1 && liar == (coul == BLANC ? N-1 : 0) )
+          piece = (coul == BLANC ? DameBL : DameNO);
+      remplis_case (liar, coar ,piece);
+      numBL = compte_pieces(BLANC);
+      numNO = compte_pieces(NOIR);
+      memo_local(MOUV_AVEC_PRISE , prof , num_mouv, li, co, ancPiece, liar, coar, piece, lipr, copr, piecepr);
+      if(Verbeux_mouvements && prof < 2)
+          affiche(MOUV_AVEC_PRISE, li, co, ancPiece, liar, coar, piece, lipr ,copr, piecepr, prof);
+      minmax = cherche_depl_avec_prise(liar, coar, piece, coul, numBL, numNO, prof, minmax, num_mouv+1 , NON , m);
+      minmax = relance_minimax(numBL ,numNO ,coul ,prof ,minmax ,m);
+      remplis_case (li, co ,ancPiece);
+      remplis_case(lipr,copr,piecepr);
+      remplis_case(liar,coar, RIEN);
+      return minmax;
     }
 
 /* --La--recherche--des--deplacements--sans--prise------------------------------------------------------------------- */
@@ -1316,6 +1248,12 @@ int effectue_depl_avec_prise ( int li , int co , int piece , int coul , int lipr
 int cherche_depl_pion_sans_prise ( int li , int co , int coul , int numBL ,
                                    int numNO , int prof , int minmax , tmm m[ PROF ][ PRISE ] )
     {
+      int piece = T[li][co];
+      if(cases_vides(li, co, 1, coul, AVANT, DROITE))
+          minmax = effectue_depl_sans_prise( li, co, piece, coul, li+AVANT*coul, co+DROITE*coul, numBL, numNO, prof, minmax , m);
+      if(cases_vides(li, co, 1, coul, AVANT, GAUCHE))
+          minmax = effectue_depl_sans_prise( li, co, piece, coul, li+AVANT*coul, co+GAUCHE*coul, numBL, numNO, prof, minmax , m);
+      return minmax;
     }
 
 /* cherche_depl_dame_sans_prise part d'une dame de couleur coul en ( li , co ) et détermine à l'aide de cases_vides
@@ -1325,6 +1263,32 @@ int cherche_depl_pion_sans_prise ( int li , int co , int coul , int numBL ,
 int cherche_depl_dame_sans_prise ( int li , int co , int coul , int numBL ,
                                    int numNO , int prof , int minmax , tmm m[ PROF ][ PRISE ] )
     {
+      int dist = 0;
+      int piece = T[li][co];
+      while(cases_vides(li ,co , dist+1, coul, AVANT , GAUCHE)) {
+          dist++;
+          if(dist > 0)
+              minmax = effectue_depl_sans_prise(li, co, piece, coul, li+AVANT*coul*dist, co+GAUCHE*coul*dist, numBL, numNO, prof, minmax, m);
+      }
+      dist = 0;
+      while(cases_vides(li ,co , dist+1, coul, AVANT , DROITE)) {
+          dist++;
+          if(dist > 0)
+              minmax = effectue_depl_sans_prise(li, co, piece, coul, li+AVANT*coul*dist, co+DROITE*coul*dist, numBL, numNO, prof, minmax, m);
+      }
+      dist = 0;
+      while(cases_vides(li ,co , dist+1, coul, ARRIERE , GAUCHE)) {
+          dist++;
+          if(dist > 0)
+              minmax = effectue_depl_sans_prise(li, co, piece, coul, li+ARRIERE*coul*dist, co+GAUCHE*coul*dist, numBL, numNO, prof, minmax,m);
+      }
+      dist = 0;
+      while(cases_vides(li ,co , dist+1, coul, ARRIERE , DROITE)) {
+          dist++;
+          if(dist > 0)
+              minmax = effectue_depl_sans_prise(li, co, piece, coul, li+ARRIERE*coul*dist, co+DROITE*coul*dist, numBL, numNO, prof, minmax, m);
+      }
+      return minmax;
     }
 
 /* effectue_depl_sans_prise considère une pièce de couleur coul en ( li , co ) qui se déplace vers ( liar , coar )
@@ -1335,6 +1299,27 @@ int cherche_depl_dame_sans_prise ( int li , int co , int coul , int numBL ,
 int effectue_depl_sans_prise ( int li , int co , int piece , int coul , int liar , int coar ,
                                int numBL , int numNO , int prof , int minmax , tmm m[ PROF ][ PRISE ] )
     {
+      int changement = NON;
+      int oldPiece = piece;
+      T[li][co] = RIEN;
+      if( piece*coul == 1 && liar == (coul == BLANC ? N-1 : 0) ) {
+          piece = (coul == BLANC ? DameBL : DameNO);
+          changement = OUI;
+      }
+      T[liar][coar] = piece;
+      if(changement) {
+          if(coul == BLANC)
+              numBL = compte_pieces(coul);
+          else
+              numNO = compte_pieces(coul);
+      }
+      memo_local(MOUV_SANS_PRISE, prof , 0, li, co, oldPiece, liar, coar, piece, RIEN, RIEN, RIEN); // QUE FAUT IL METTRE DANS LIPR ET COPR QUAND PAS DE PRISE!!!!!
+      if(Verbeux_mouvements && prof < 2)
+          affiche(MOUV_SANS_PRISE, li, co, oldPiece, liar, coar, piece, RIEN ,RIEN, RIEN, prof);
+      minmax = relance_minimax(numBL ,numNO ,coul ,prof ,minmax ,m);
+      remplis_case (li, co ,oldPiece);
+      T[liar][coar] = RIEN;
+      return minmax;
     }
 
 /* --C--est--tout---------------------------------------------------------------------------------------------------- */
