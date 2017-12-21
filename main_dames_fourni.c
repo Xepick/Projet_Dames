@@ -873,33 +873,40 @@ int prise_possible_toutes ( int li , int co , int coul )
    La fonction rend un booléen qui dit si, oui ou non, une prise est possible dans la direction indiquée. De plus,
    plutôt que de répondre simplement VRAI, elle donne la distance de la pièce prise. Ainsi, un pion prendra toujours
    à distance 1, mais une dame pourra prendre des pièces à d'autres distances. */
-
 int prise_possible_case ( int li , int co , int coul , int sens , int direct )
 {
   int piece=contenu_case(li,co);
   int i=0,compteur=0;
     if(piece*coul==1)
     {
-          if(contenu_case((li+sens*coul),(co+coul*direct))*coul==1 || contenu_case((li+sens*coul),(co+coul*direct))*coul==2)
-            if(contenu_case((li+2*sens*coul),(co+2*coul*direct))==RIEN)
-                return compteur++; // On peut prendre à 1 de distance
+      if(contenu_case((li+sens*coul),(co+coul*direct))*(-coul)==1 || contenu_case((li+sens*coul),(co+coul*direct))*(-coul)==2)
+          if(contenu_case((li+2*sens*coul),(co+2*coul*direct))==RIEN)
+             return compteur+1; // On peut prendre à 1 de distance
       return 0;
     }
     else// DameBL
     { // changer li<(N-2)
       if(li>1 && li <(N-2) && co>1 && co<(N-2)) // Si on est dans La partie où on peut prendre
-        {
+        { printf("Passé dans if");
           while(contenu_case((li+sens*coul),(co+coul*direct))==RIEN && li>1 && li<(N-2) && co>1 && co<(N-2)) // continue jusqu'à être au bord de la zone de prise
           {
-            compteur++;
+            printf("Dans mon while\n");
+            compteur=compteur+1;
             li=li+coul*sens;
             co=co+coul*direct;
           }// Stop si on trouve un pion
-          if((contenu_case(li,co)*coul==1 || contenu_case(li,co)*coul==2)  && contenu_case((li+sens*coul),(co+coul*direct))==RIEN) // vérifie la dernière case derrière le pion
-            return compteur;
-          else //
-            return 0;
+          li=li+coul*sens;
+          co=co+coul*direct;
+          compteur=compteur+1;
+          if(contenu_case(li,co)*(-coul)==1 || contenu_case(li,co)*(-coul)==2)
+            { li=li+coul*sens;
+              co=co+coul*direct;
+              compteur=compteur+1;
+              if(contenu_case((li+sens*coul),(co+coul*direct))==RIEN && (li<=(N-1) && li>=0 && co<=(N-1) && co>=0))   // vérifie la dernière case derrière le pion
+                return compteur;
+            }
         }
+      return 0;
     }
 }
 
