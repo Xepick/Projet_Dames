@@ -816,24 +816,25 @@ void print_mouv ( tmm m[ PRISE ] , int indent )
    analysée dans prise_possible_toutes. */
 
 int prise_possible_avant ( int coul )
-    {
-      int ligne=0,colonne=0;
-      for(ligne=0;ligne<(N-1);ligne++)
-        for(colonne=0;colonne<(N-1);colonne++)
-          {
-            if(T[ligne][colonne]*coul==1)
-              if(prise_possible_case(ligne,colonne,coul,AVANT,DROITE)==1 || prise_possible_case(ligne,colonne,coul,AVANT,GAUCHE)==1)
-                return 1;
-            else
-              if(prise_possible_case(ligne,colonne,coul,AVANT,DROITE)==1 || prise_possible_case(ligne,colonne,coul,AVANT,GAUCHE)==1)
-                return 1;
-              else if(prise_possible_case(ligne,colonne,coul,ARRIERE,DROITE)==1 || prise_possible_case(ligne,colonne,coul,ARRIERE,GAUCHE)==1)
-                return 1;
-              else
-                return 0;
+{
+  int ligne=0,colonne=0;
+  for(ligne=0;ligne<=(N-1);ligne++)
+    for(colonne=0;colonne<=(N-1);colonne++)
+      {
+        if(T[ligne][colonne]*coul==1)
+          {if(prise_possible_case(ligne,colonne,coul,AVANT,DROITE)==1 || prise_possible_case(ligne,colonne,coul,AVANT,GAUCHE)==1)
+            return 1;
           }
-      return 0;
-    }
+        else
+        {
+          if((prise_possible_case(ligne,colonne,coul,AVANT,DROITE)!=0) || (prise_possible_case(ligne,colonne,coul,AVANT,GAUCHE)!=0))
+              return 1;
+          else if(prise_possible_case(ligne,colonne,coul,ARRIERE,DROITE)!=0 || prise_possible_case(ligne,colonne,coul,ARRIERE,GAUCHE)!=0)
+            return 1;
+        }
+      }
+  return 0;
+}
 
 /* On teste toutes les possibités de prise à partir du peint de départ. */
 
@@ -887,10 +888,9 @@ int prise_possible_case ( int li , int co , int coul , int sens , int direct )
     else// DameBL
     { // changer li<(N-2)
       if(li>1 && li <(N-2) && co>1 && co<(N-2)) // Si on est dans La partie où on peut prendre
-        { printf("Passé dans if");
+        {
           while(contenu_case((li+sens*coul),(co+coul*direct))==RIEN && li>1 && li<(N-2) && co>1 && co<(N-2)) // continue jusqu'à être au bord de la zone de prise
           {
-            printf("Dans mon while\n");
             compteur=compteur+1;
             li=li+coul*sens;
             co=co+coul*direct;
