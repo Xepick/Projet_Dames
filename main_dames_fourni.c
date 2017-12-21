@@ -899,9 +899,7 @@ int prise_possible_case ( int li , int co , int coul , int sens , int direct )
           co=co+coul*direct;
           compteur=compteur+1;
           if(contenu_case(li,co)*(-coul)==1 || contenu_case(li,co)*(-coul)==2)
-            { li=li+coul*sens;
-              co=co+coul*direct;
-              compteur=compteur+1;
+            { 
               if(contenu_case((li+sens*coul),(co+coul*direct))==RIEN && (li<=(N-1) && li>=0 && co<=(N-1) && co>=0))   // vérifie la dernière case derrière le pion
                 return compteur;
             }
