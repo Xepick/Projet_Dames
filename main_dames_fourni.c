@@ -165,40 +165,39 @@ int effectue_depl_sans_prise ( int lidp , int codp , int piece , int coul , int 
 /* Le fichier out_main contient le résultat produit par main. Si ces tests sont concluants, on peut partir du
    principe que le programmeur saura mettre en place un dialogue avec l'utilisateur. */
 
-int main ( int argc , char * argv[ ] )
-    {N=10;
-      remplis_echiquier( ) ;
-      print_echiquier();
-      if ( argc <= 1 )
-        {N = 10 ;
-         main_test_prise( ) ;
-         main_bouge_sans_prise( ) ;
-         main_bouge_sans_prise_prof_deux( ) ;
-         main_bouge_avec_prise( ) ;
-         main_grand_test( 10 ) ;
-         main_petit_test( 11 ) ;
-        }
-     else
-        if ( argc == 4 )
-           {int coul_ordi , prof ;
-            char * texte[ 3 ] = { "noirs" , "" , "blancs" } ;
-            N = atoi( argv[ 1 ] ) ;
-            coul_ordi = atoi( argv[ 2 ] ) ;
-            prof = atoi( argv[ 3 ] ) ;
-            if ( coul_ordi )
-               coul_ordi = BLANC ;
-            else
-               coul_ordi = NOIR ;
-            if ( ( N == 8 || N == 10 ) && ( 0 < prof && prof < PROF ) )
-               {(void)printf( "L'échiquier est de taille %d et l'ordi joue les " , N ) ;
-                (void)printf( "%s. La profondeur de recherche est de %d.\n" , texte[ coul_ordi + 1 ] , prof ) ;
-                remplis_echiquier( ) ;
-
-                itere_jeu( coul_ordi , prof ) ;
-               }
-           }
-     (void)printf( "Bye !\n" ) ;
-     return( 0 ) ;
+int main ( int argc , char * argv[ ] ){
+  N=10;
+    remplis_echiquier( ) ;
+    print_echiquier();
+    if ( argc <= 1 )
+      {N = 10 ;
+       main_test_prise( ) ;
+       main_bouge_sans_prise( ) ;
+       main_bouge_sans_prise_prof_deux( ) ;
+       main_bouge_avec_prise( ) ;
+       main_grand_test( 10 ) ;
+       main_petit_test( 11 ) ;
+      }
+   else
+      if ( argc == 4 )
+         {int coul_ordi , prof ;
+          char * texte[ 3 ] = { "noirs" , "" , "blancs" } ;
+          N = atoi( argv[ 1 ] ) ;
+          coul_ordi = atoi( argv[ 2 ] ) ;
+          prof = atoi( argv[ 3 ] ) ;
+          if ( coul_ordi )
+             coul_ordi = BLANC ;
+          else
+             coul_ordi = NOIR ;
+          if ( ( N == 8 || N == 10 ) && ( 0 < prof && prof < PROF ) )
+             {(void)printf( "L'échiquier est de taille %d et l'ordi joue les " , N ) ;
+              (void)printf( "%s. La profondeur de recherche est de %d.\n" , texte[ coul_ordi + 1 ] , prof ) ;
+              remplis_echiquier( ) ;
+              itere_jeu( coul_ordi , prof ) ;
+             }
+         }
+   (void)printf( "Bye !\n" ) ;
+   return( 0 ) ;
     }
 
 /* --Les--fonctions--de--test---------------------------------------------------------------------------------------- */
@@ -451,80 +450,43 @@ void main_petit_test ( int prof )
 /* Cette fonction construit l'échiquier initial. La case ( 0 , 0 ), en bas à gauche, relit un pion. Sur un
    damier de taille N , les N - 1 premières lignes comportent des pions blancs et les N - 1 dernières des noirs. */
 
-void remplis_echiquier ( void ) // DONE
-{
-    int ligne=0,colonne=0,compteur=0; // don't forget on commence ligne 0
-    int ligne_max_basse=(N/2)-1,ligne_mediane=(N/2)+1;
+   void remplis_echiquier ( void ) // DONE
+   {
+       int ligne,colonne, couleur;
+       int ligne_max_basse=(N/2)-1,ligne_mediane=(N/2)+1;
 
-    for (ligne=0;ligne<ligne_max_basse;ligne++)
-    {
-        if(colonne==(N-1))
-        {
-            while(compteur< N/2)
-            {
-                remplis_case(ligne,colonne,PionBL);
-                colonne--;
-                remplis_case(ligne,colonne,RIEN);
-                colonne--;
-                compteur++;
-            }compteur=0;
+       for (ligne = 0; ligne<N; ligne++)
+        for (colonne = 0; colonne < N; colonne++){
+          if (ligne>=ligne_max_basse)
+            if (ligne>=ligne_mediane)
+              couleur = NOIR;
+            else
+              couleur = RIEN;
+          else
+            couleur = BLANC;
+          if((colonne%2 == 0 ^ ligne%2 == 0) == 1)
+            couleur = RIEN;
+          remplis_case(ligne,colonne,couleur);
         }
-        if(colonne==0)
-        {
-            while(compteur<N/2)
-            {
-                remplis_case(ligne,colonne,PionBL);
-                colonne++;
-                remplis_case(ligne,colonne,RIEN);
-                colonne++;compteur++;
-            }compteur=0;
-        }
-
-    }
-    for(ligne=ligne_max_basse;ligne!=ligne_mediane;ligne++)
-    {
-            for(compteur=0;compteur<N;compteur++)
-                  remplis_case(ligne,colonne,RIEN);
-            colonne=0;
-    }
-    compteur=0;
-    for(ligne=ligne_mediane;ligne!=(N-1);ligne++)
-    {
-        if(colonne==(N-1))
-        {
-            while(compteur<N/2)
-            {
-                remplis_case(ligne,colonne,PionBL);
-                colonne--;
-                remplis_case(ligne,colonne,RIEN);
-                colonne--;
-                compteur++;
-            }compteur=0;
-        }
-        if(colonne==0)
-        {
-            while(compteur<(N/2))
-            {
-                remplis_case(ligne,colonne,PionBL);
-                colonne++;
-                remplis_case(ligne,colonne,RIEN);
-                colonne++;compteur++;
-            }compteur=0;
-        }
-    }
-}
-
+   }
 /* La fonction qui modifie une case de l'échiquier */
 
 inline void remplis_case ( int li , int co , int piece )
-     {T[ li ][ co ] = piece ;
+     {
+       T[ li ][ co ] = piece ;
      }
 
 /* Ici, on compte le nombre de pièces de la couleur donnée. Chaque dame est créditée d'un bonus BonusDame. */
 
 int compte_pieces ( int coul )
     {
-
+      int i, j, somme = 0;
+      for ( i = 0; i < N; i++ ) {
+        for ( j = 0; j < N; j++ ) {
+          somme += (coul*T[i][j]>0) + ((coul*T[i][j]>1)*BonusDame);
+        }
+      }
+      return somme;
     }
 
 /* --Des--fonctions--auxiliaires------------------------------------------------------------------------------------- */
@@ -532,11 +494,13 @@ int compte_pieces ( int coul )
 /* Ces prédicats disent si, oui ou non, on a affaire à une dame, un pion ou une pièce de la couleur indiquée. */
 
 inline int est_dame ( int li , int co , int coul )
-    {return( T[ li ][ co ] * coul == 2 ) ;
+    {
+      return( T[ li ][ co ] * coul == 2 ) ;
     }
 
 inline int est_pion ( int li , int co , int coul )
-    {return( T[ li ][ co ] * coul == 1 ) ;
+    {
+      return( T[ li ][ co ] * coul == 1 ) ;
     }
 
 inline int est_piece ( int li , int co , int coul )
@@ -607,7 +571,11 @@ void annule_mouvements ( tmm m[ PROF ][ PRISE ] )
 
 void joue_sequence ( int profdeb , int proffin )
      {
-
+       assert(profdeb >= proffin);
+           int i;
+           for(i = profdeb ; i >= proffin ; --i) {
+               joue_mouvements(Memo[i-1]);
+           }
      }
 
 /* joue_mouvements déroule les mouvements consécutifs d'une pièce. Il n'y a aucun contrôle effectué, car on suppose
@@ -621,6 +589,14 @@ void joue_mouvements ( tmm m[ PRISE ] )
 
 void joue_mouv ( tmm m )
      {
+       remplis_case(m.li, m.co, RIEN);
+       remplis_case(m.liar, m.coar, m.piecear);
+    if( m.tdepl == MOUV_AVEC_PRISE)
+        remplis_case(m.lipr, m.copr, RIEN);
+
+    if(Verbeux_mouvements)
+        affiche(m.tdepl, m.li, m.co, m.piece, m.liar, m.coar, m.piece, m.lipr ,m.copr, m.piecepr, RIEN);
+
      }
 
 /* --Les--fonctions--d--impression--de--l--échiquier----------------------------------------------------------------- */
@@ -629,14 +605,13 @@ void joue_mouv ( tmm m )
 
 void print_echiquier ( void ) // print toutes les lignes de l'échiquier une par une
      {
-        int ligne=0;
-        for(ligne=(N-1);ligne>=0;ligne--)
-        {
-            print_line('+','-');
-            print_echiquier_colonnes(ligne);
-            print_echiquier_ligne(ligne);
-            print_echiquier_colonnes(ligne);
-        }
+        int i;
+        for(i=(N-1);i>=0;i--)
+          print_echiquier_ligne(i);
+          printf("    " );
+        for(i=0;i<N;i++)
+          printf("   %d    ",i);
+        printf("\n" );
      }
 
 int contenu_case(int lig, int col) // Retourne le contenu d'une case de l'echiquier
@@ -681,27 +656,17 @@ void print_contenu(int contenu) // Printf le contenu d'une case avec les lettres
 
 void print_echiquier_ligne ( int li )
 {
-     int colonne_max=N-1,sous_ligne=0,contenu=0;
-     int colonne=0,ligne=0;
-
-    for(sous_ligne=0;sous_ligne<4;sous_ligne++) // printer 4 sous ligne pour une case
-    {
-        if(sous_ligne==0) // printf la ligne du haut, la première et qui est différente des autres
-            print_line('+','-');
-
-        else if(sous_ligne==2) // printf la ligne avec les pions.
-            print_echiquier_colonnes(li);
-
-        else // print les sous lignes où il n'y a pas de pions.
-            print_line('|',' ');
-
-        sous_ligne++;
-    }
-    if(li==0) // Si on est à la ligne 0 on a besoin d'une ligne de bord en bas
-    {
+      int sous_ligne=0,contenu=0;
+      int colonne=0,ligne=0;
+      if(li==N-1) // Si on est à la ligne 0 on a besoin d'une ligne de bord en bas
+        print_line('-','-');
+      print_line('|',' ');
+      print_echiquier_colonnes(li);
+      print_line('|',' ');
+      if(li != 0)
         print_line('+','-');
-    }
-
+      else
+        print_line('-','-');
 }
 /* print_echiquier_colonne ( <numéro> ) affiche une ligne physique, comme par exemple :
 
@@ -712,12 +677,12 @@ void print_echiquier_ligne ( int li )
 void print_echiquier_colonnes ( int li )
      {
         printf(" %d ",li);
-        int colonne=0;
-        for(colonne=0;colonne<(N-1);colonne++)
+        int colonne;
+        for(colonne=0;colonne<N;colonne++)
         {
-            printf("|  ");
+            printf("|   ");
             print_contenu(T[li][colonne]);
-            printf("  ");
+            printf("   ");
         }printf("|\n");
      }
 
@@ -733,17 +698,11 @@ ou
 
 void print_line ( char separator_char , char fill_char )
 {
-     int i=0;
-     printf("   ");
-     for(i=0;i<(N-1);i++)
-     {
-         if(i==0)
-            printf("|%c%c%c%c",fill_char,fill_char,fill_char,fill_char);
-         else if(i==(N-1))
-            printf("%c%c%c%c|",fill_char,fill_char,fill_char,fill_char);
-         else
-            printf("%c%c%c%c%c", separator_char,fill_char,fill_char,fill_char,fill_char);
-     }printf("%c\n",separator_char);
+     int i;
+     printf("   |");
+     for ( i = 0; i<N-1 ; i++)
+            printf("%c%c%c%c%c%c%c%c",fill_char,fill_char,fill_char,fill_char,fill_char,fill_char,fill_char,separator_char);
+     printf("%c%c%c%c%c%c%c|\n",fill_char,fill_char,fill_char,fill_char,fill_char,fill_char,fill_char);
 }
 
 /* --D--autres--fonctions--d--impression----------------------------------------------------------------------------- */
@@ -807,7 +766,37 @@ void print_mouvement ( int prof , int indent )
 
 void print_mouv ( tmm m[ PRISE ] , int indent )
      {
-     }
+        int i, prise = 0;
+
+        for(i = 0; i < indent; i++)
+            printf(" ");
+        if (m[0].piece == PionBL)
+          printf("Le mouvement du pion blanc va\n");
+        else if (m[0].piece == PionNO)
+          printf("Le mouvement du pion noir va\n");
+        else if (m[0].piece == DameBL)
+          printf("Le mouvement de la dame blanche va\n");
+        else if (m[0].piece == DameNO)
+          printf("Le mouvement de la dame noire va\n");
+
+        while(prise < PRISE && m[prise].piece != RIEN) // on sort si on a plus de mouvement avec la piece ou si fin du tableau
+        {
+          for(i = 0; i < indent; i++)
+              printf(" ");
+          printf("    ");
+          printf("de ( %d , %d ) à ( %d , %d )", m[prise].li, m[prise].co, m[prise].liar, m[prise].coar);
+
+          if (abs(m[prise].piecepr) == 1)
+              printf(" et prise de pion en ( %d , %d )", m[prise].lipr, m[prise].copr);
+          else if(abs(m[prise].piecepr) == 2)
+              printf(" et prise de dame en ( %d , %d )", m[prise].lipr, m[prise].copr);
+
+          if (m[prise].piece != m[prise].piecear)
+              printf(" avec promotion dame");
+          printf("\n");
+          prise++;
+      }
+    }
 
 /* --Les--fonctions--pour--tester--les--prises----------------------------------------------------------------------- */
 
@@ -816,49 +805,34 @@ void print_mouv ( tmm m[ PRISE ] , int indent )
    analysée dans prise_possible_toutes. */
 
 int prise_possible_avant ( int coul )
-{
-  int ligne=0,colonne=0;
-  for(ligne=0;ligne<=(N-1);ligne++)
-    for(colonne=0;colonne<=(N-1);colonne++)
-      {
-        if(T[ligne][colonne]*coul==1)
-          {if(prise_possible_case(ligne,colonne,coul,AVANT,DROITE)==1 || prise_possible_case(ligne,colonne,coul,AVANT,GAUCHE)==1)
-            return 1;
-          }
-        else
-        {
-          if((prise_possible_case(ligne,colonne,coul,AVANT,DROITE)!=0) || (prise_possible_case(ligne,colonne,coul,AVANT,GAUCHE)!=0))
-              return 1;
-          else if(prise_possible_case(ligne,colonne,coul,ARRIERE,DROITE)!=0 || prise_possible_case(ligne,colonne,coul,ARRIERE,GAUCHE)!=0)
-            return 1;
-        }
-      }
-  return 0;
-}
-
-/* On teste toutes les possibités de prise à partir du peint de départ. */
-
-int prise_possible_toutes ( int li , int co , int coul )
     {
-      if(T[li][co]*coul==2)
-      {
-          if(prise_possible_case(li,co,coul,AVANT,DROITE)!=0)
-            return DROITE;
-          if(prise_possible_case(li,co,coul,AVANT,GAUCHE)!=0)
-              return GAUCHE;
-          if(prise_possible_case(li,co,coul,ARRIERE,DROITE)!=0)
-            return -DROITE;
-          if(prise_possible_case(li,co,coul,ARRIERE,GAUCHE)!=0)
-            return -GAUCHE;
-       }
-       if(T[li][co]*coul==1)
-       {
-           if(prise_possible_case(li,co,coul,AVANT,DROITE)!=0)
-             return DROITE;
-           if(prise_possible_case(li,co,coul,AVANT,GAUCHE)!=0)
-               return GAUCHE;
-        }
+      int ligne=0,colonne=0;
+      for(ligne=0;ligne<=(N-1);ligne++)
+        for(colonne=0;colonne<=(N-1);colonne++)
+            if(est_pion(ligne,colonne,coul))
+              if(prise_possible_case(ligne,colonne,coul,AVANT,DROITE)==1 || prise_possible_case(ligne,colonne,coul,AVANT,GAUCHE)==1)
+                return 1;
+            else if(est_dame(ligne,colonne,coul))
+              if((prise_possible_case(ligne,colonne,coul,AVANT,DROITE)!=0) || (prise_possible_case(ligne,colonne,coul,AVANT,GAUCHE)!=0))
+                  return 1;
+              else if(prise_possible_case(ligne,colonne,coul,ARRIERE,DROITE)!=0 || prise_possible_case(ligne,colonne,coul,ARRIERE,GAUCHE)!=0)
+                return 1;
+      return 0;
     }
+
+/* On teste toutes les possibités de prise à partir du point de départ. */
+
+  int prise_possible_toutes ( int li , int co , int coul )
+  {
+    int prise_possible = prise_possible_case(li, co, coul, AVANT, GAUCHE);
+    if( prise_possible == NON )
+        prise_possible = prise_possible_case(li, co, coul, AVANT, DROITE);
+    if( prise_possible == NON )
+        prise_possible = prise_possible_case(li, co, coul, ARRIERE, GAUCHE);
+    if( prise_possible == NON )
+        prise_possible = prise_possible_case(li, co, coul, ARRIERE, DROITE);
+    return (prise_possible != 0);
+  }
 
 /* prise_possible_case reçoit les coordonnées li et co d'une pièce de la couleur coul. On peut avoir affaire à une
    dame ou un pion. sens peut valoir AVANT ou ARRIERE et direct GAUCHE ou DROITE. Cette fonction est appelée par les
@@ -874,41 +848,41 @@ int prise_possible_toutes ( int li , int co , int coul )
    La fonction rend un booléen qui dit si, oui ou non, une prise est possible dans la direction indiquée. De plus,
    plutôt que de répondre simplement VRAI, elle donne la distance de la pièce prise. Ainsi, un pion prendra toujours
    à distance 1, mais une dame pourra prendre des pièces à d'autres distances. */
+
 int prise_possible_case ( int li , int co , int coul , int sens , int direct )
 {
   int piece=contenu_case(li,co);
-  int i=0,compteur=0;
-    if(piece*coul==1)
-    {
-      if(contenu_case((li+sens*coul),(co+coul*direct))*(-coul)==1 || contenu_case((li+sens*coul),(co+coul*direct))*(-coul)==2)
-          if(contenu_case((li+2*sens*coul),(co+2*coul*direct))==RIEN)
-             return compteur+1; // On peut prendre à 1 de distance
-      return 0;
-    }
-    else// DameBL
-    { // changer li<(N-2)
-      if(li>1 && li <(N-2) && co>1 && co<(N-2)) // Si on est dans La partie où on peut prendre
-        {
-          while(contenu_case((li+sens*coul),(co+coul*direct))==RIEN && li>1 && li<(N-2) && co>1 && co<(N-2)) // continue jusqu'à être au bord de la zone de prise
-          {
-            compteur=compteur+1;
+    int i=0,compteur=0;
+      if(piece*coul==1)
+      {
+        if(contenu_case((li+sens*coul),(co+coul*direct))*(-coul)==1 || contenu_case((li+sens*coul),(co+coul*direct))*(-coul)==2)
+            if(contenu_case((li+2*sens*coul),(co+2*coul*direct))==RIEN)
+               return compteur+1; // On peut prendre à 1 de distance
+        return 0;
+      }
+      else// DameBL
+      { // changer li<(N-2)
+        //if(li>=1 && li <=(N-1) && co>=1 && co<=(N-1)) // Si on est dans La partie où on peut prendre
+          //{
+
+            while(contenu_case((li+sens*coul),(co+coul*direct))==RIEN && (li+sens*coul)>1 && (li+sens*coul)<(N-1) && (co+coul*direct)>1 && (co+coul*direct)<(N-1)) // continue jusqu'à être au bord de la zone de prise
+            {
+              compteur=compteur+1;
+              li=li+coul*sens;
+              co=co+coul*direct;
+            }// Stop si on trouve un pion
             li=li+coul*sens;
             co=co+coul*direct;
-          }// Stop si on trouve un pion
-          li=li+coul*sens;
-          co=co+coul*direct;
-          compteur=compteur+1;
-          if(contenu_case(li,co)*(-coul)==1 || contenu_case(li,co)*(-coul)==2)
-            { 
-              if(contenu_case((li+sens*coul),(co+coul*direct))==RIEN && (li<=(N-1) && li>=0 && co<=(N-1) && co>=0))   // vérifie la dernière case derrière le pion
-                return compteur;
-            }
-        }
-      return 0;
-    }
+            compteur=compteur+1;
+            if(contenu_case(li,co)*(-coul)==1 || contenu_case(li,co)*(-coul)==2)
+              {
+                if(contenu_case((li+sens*coul),(co+coul*direct))==RIEN && (li<=(N-1) && li>=0 && co<=(N-1) && co>=0))   // vérifie la dernière case derrière le pion
+                  return compteur;
+              }
+          //}
+        return 0;
+      }
 }
-
-
 
 /* --Le--test--de--cases--vides-------------------------------------------------------------------------------------- */
 
@@ -920,60 +894,18 @@ int prise_possible_case ( int li , int co , int coul , int sens , int direct )
 
 int cases_vides ( int li , int co , int num , int coul , int sens , int direct )
     {
-        int i=0,compteur_vide=0;
-        if(sens=AVANT)
-        {
-            if(direct=DROITE)
-            {
-                for(i=0;i<num;i++)
-                {
-                    li++;co++;
-                    assert(li>=N);assert(co>=N);
-                    if(contenu_case(li,co)==RIEN)
-                        compteur_vide++;
-                }
-            }
-            else
-            {
-                for(i=0;i<num;i++)
-                {
-                    li++;co--;
-                    assert(li>=N);
-                    assert(co<0);
-                    if(contenu_case(li,co)==RIEN)
-                        compteur_vide++;
-                }
-            }
-        }
-        else
-        {
-            if(direct=DROITE)
-            {
-                for(i=0;i<num;i++)
-                {
-                    li--;co++;
-                    assert(li<0);
-                    assert(co>=N);
-                    if(contenu_case(li,co)==RIEN)
-                        compteur_vide++;
-                }
-            }
-            else
-            {
-                for(i=0;i<num;i++)
-                {
-                    li--;co--;
-                    assert(li<0);
-                    assert(co<0);
-                    if(contenu_case(li,co)==RIEN)
-                        compteur_vide++;
-                }
-            }
-        }
-        if(compteur_vide==num)
-            return 1;
-        else
-            return 0;
+      int nb_cases_vides = 0, case_vide = OUI, cpt_cases = 1;
+      if( (li + num*coul*sens >= N || li + num*coul*sens < 0) || ( co + num*coul*direct >= N || co + num*coul*direct < 0 ))
+          case_vide = NON;
+      else
+          while( case_vide && nb_cases_vides < num) {
+              if( T[li + cpt_cases*coul*sens][co + cpt_cases*coul*direct] == RIEN )
+                  nb_cases_vides++;
+              else
+                  case_vide = NON;
+              cpt_cases++;
+          }
+      return case_vide;
     }
 
 /* --La--boucle--de--jeu--principale--------------------------------------------------------------------------------- */
@@ -1048,6 +980,47 @@ int suite_ou_pas ( void )
 int analyse_mouvement ( int dep , int arr , int prise_ou_pas , int couleur , int * num_mouv ,
                         tmm depl[ PRISE ] , int * suite , int * lisuite , int * cosuite )
     {
+      int mouvement_autoriser = OUI;
+
+      int depLi = dep / 10;
+      int depCo = dep % 10;
+      int arrLi = arr / 10;
+      int arrCo = arr % 10;
+
+     if ( (arrLi - depLi != arrCo - depCo) && (arrLi - depLi != -(arrCo - depCo)) )// les coordonnées sont sur des diagonales différentes
+         mouvement_autoriser = NON;
+
+     if(mouvement_autoriser && T[depLi][depCo] == RIEN)
+         mouvement_autoriser = NON;
+
+     if(mouvement_autoriser && T[arrLi][arrCo] != RIEN)
+         mouvement_autoriser = NON;
+
+     int pieceArr = T[depLi][depCo];
+     if(mouvement_autoriser && T[depLi][depCo]*couleur == 1 && arrLi == (couleur == BLANC ? N-1 : 0) )
+         pieceArr = (couleur == BLANC ? DameBL : DameNO);
+
+     if(mouvement_autoriser) {
+         if (! prise_ou_pas) {
+             memo ( depl , MOUV_SANS_PRISE , *num_mouv , depLi , depCo , T[depLi][depCo] , arrLi , arrCo , pieceArr , RIEN , RIEN, RIEN ) ;
+             joue_mouv(depl[0]);
+         }
+         else {
+             int newPrise = prise_possible_toutes(arrLi, arrCo, couleur);
+             if(newPrise != 0) {
+                 *suite = OUI;
+                 *lisuite = arrLi+newPrise;
+                 *cosuite = arrCo+newPrise;
+                 mouvement_autoriser = NON;
+                 *num_mouv++;
+             }
+             int liPr = arrLi-1*(depLi < arrLi ? 1 : -1);
+             int coPr = arrCo-1*(depCo < arrCo ? 1 : -1);
+             memo ( depl , MOUV_AVEC_PRISE , *num_mouv , depLi , depCo , T[depLi][depCo] , arrLi , arrCo , pieceArr , liPr , coPr, T[liPr][coPr]) ;
+             joue_mouv(depl[*num_mouv]);
+         }
+     }
+     return mouvement_autoriser;
     }
 
 /* Un camp a perdu s'il ne peut plus bouger aucune pièce. */
@@ -1152,6 +1125,30 @@ int relance_minimax ( int numBL , int numNO , int coul , int prof , int minmax ,
 
 int cherche_depl ( int numBL , int numNO , int coul , int prof , int minmax , tmm m[ PROF ][ PRISE ] )
     {
+      int li, col, piece;
+      int num_mouv = 0;
+      int seulement_avant;
+      if( prise_possible_avant(coul) )
+        for(li = 0; li < N; ++li)
+          for(col = 0; col < N; ++col)
+            if(est_piece(li, col, coul)) {
+             piece = T[li][col];
+             if(est_pion(li, col, coul))
+                 seulement_avant = OUI;
+             else
+                 seulement_avant = NON;
+             minmax = cherche_depl_avec_prise(li ,col ,piece ,coul , numBL, numNO, prof, minmax ,num_mouv ,seulement_avant ,m);
+           }
+       else // deplacement sans prise
+        for(li = 0; li < N; ++li)
+          for(col = 0; col < N; ++col)
+            if(est_piece(li, col, coul)) {
+                if(est_pion(li, col, coul))
+                  minmax = cherche_depl_pion_sans_prise(li, col, coul ,numBL , numNO, prof, minmax , m);
+                else    // c'est une dame
+                  minmax = cherche_depl_dame_sans_prise(li, col, coul ,numBL , numNO, prof, minmax , m);
+            }
+       return minmax;
     }
 
 /* cherche_depl_avec_prise considère la pièce située en li et co et de couleur coul. Elle cherche les mouvements qui
@@ -1164,6 +1161,42 @@ int cherche_depl ( int numBL , int numNO , int coul , int prof , int minmax , tm
 int cherche_depl_avec_prise ( int li , int co , int piece , int coul , int numBL , int numNO , int prof ,
                               int minmax , int num_mouv , int seulement_avant , tmm m[ PROF ][ PRISE ] )
     {
+      if(seulement_avant && piece*coul == 1)// si c'est le premier mouvement d'un pion on ne peut prendre que vers l'avant.
+      {
+        // Deplacement vers AVANT GAUCHE
+        if(prise_possible_case(li, co, coul, AVANT, GAUCHE) == 1)
+           minmax = effectue_depl_avec_prise(li, co, piece, coul, li+AVANT*coul, co+GAUCHE*coul , li+AVANT*coul*2,
+                                             co+GAUCHE*coul*2 , numBL, numNO, prof, minmax, num_mouv, m);
+       // Deplacement vers AVANT DROITE
+       if(prise_possible_case(li, co, coul, AVANT, DROITE) == 1)
+           minmax = effectue_depl_avec_prise(li, co, piece, coul, li+AVANT*coul, co+DROITE*coul , li+AVANT*coul*2,
+                                             co+DROITE*coul*2 , numBL, numNO, prof, minmax, num_mouv, m);
+   }
+   else {
+       int distanceP;
+       // Deplacement vers AVANT GAUCHE
+       distanceP = prise_possible_case(li, co, coul, AVANT, GAUCHE);
+       if(distanceP > 0 && ( (piece*coul==2) || (distanceP == 1) ))   // Si c'est une dame ou si c'est un pion qui à une prise à distance de 1
+           minmax = effectue_depl_avec_prise(li, co, piece, coul, li+AVANT*coul*distanceP, co+GAUCHE*coul*distanceP , li+AVANT*coul*(distanceP+1),
+                                             co+GAUCHE*coul*(distanceP+1) , numBL, numNO, prof, minmax, num_mouv, m);
+       // Deplacement AVANT DROITE
+       distanceP = prise_possible_case(li, co, coul, AVANT, DROITE);
+       if(distanceP > 0 && ( (piece*coul==2) || (distanceP == 1) ))
+           minmax = effectue_depl_avec_prise(li, co, piece, coul, li+AVANT*coul*distanceP, co+DROITE*coul*distanceP , li+AVANT*coul*(distanceP+1),
+                                             co+DROITE*coul*(distanceP+1) , numBL, numNO, prof, minmax, num_mouv, m);
+       // Deplacement vers ARRIERE GAUCHE
+       distanceP = prise_possible_case(li, co, coul, ARRIERE, GAUCHE);
+       if(distanceP > 0 && ( (piece*coul==2) || (distanceP == 1) ))
+           minmax = effectue_depl_avec_prise(li, co, piece, coul, li+ARRIERE*coul*distanceP, co+GAUCHE*coul*distanceP , li+ARRIERE*coul*(distanceP+1),
+                                             co+GAUCHE*coul*(distanceP+1) , numBL, numNO, prof, minmax, num_mouv, m);
+       // Deplacement vers ARRIERE DROITE
+       distanceP = prise_possible_case(li, co, coul, ARRIERE, DROITE);
+       if(distanceP > 0 && ( (piece*coul==2) || (distanceP == 1) ))
+           minmax = effectue_depl_avec_prise(li, co, piece, coul, li+ARRIERE*coul*distanceP, co+DROITE*coul*distanceP , li+ARRIERE*coul*(distanceP+1),
+                                             co+DROITE*coul*(distanceP+1) , numBL, numNO, prof, minmax, num_mouv, m);
+   }
+
+   return minmax;
     }
 
 /* La fonction suivante considère une pièce de couleur coul en ( li , co ) qui va prendre une pièce adverse en
@@ -1186,6 +1219,25 @@ int cherche_depl_avec_prise ( int li , int co , int piece , int coul , int numBL
 int effectue_depl_avec_prise ( int li , int co , int piece , int coul , int lipr , int copr , int liar , int coar ,
                                int numBL , int numNO , int prof , int minmax , int num_mouv , tmm m[ PROF ][ PRISE ] )
     {
+      int ancPiece = piece; // sauvegarde l'ancienne valeur
+      int piecepr = T[lipr][copr];
+      remplis_case(li,co,RIEN);
+      remplis_case(lipr,copr,RIEN);
+
+      if( piece*coul == 1 && liar == (coul == BLANC ? N-1 : 0) )
+          piece = (coul == BLANC ? DameBL : DameNO);
+      remplis_case (liar, coar ,piece);
+      numBL = compte_pieces(BLANC);
+      numNO = compte_pieces(NOIR);
+      memo_local(MOUV_AVEC_PRISE , prof , num_mouv, li, co, ancPiece, liar, coar, piece, lipr, copr, piecepr);
+      if(Verbeux_mouvements && prof < 2)
+          affiche(MOUV_AVEC_PRISE, li, co, ancPiece, liar, coar, piece, lipr ,copr, piecepr, prof);
+      minmax = cherche_depl_avec_prise(liar, coar, piece, coul, numBL, numNO, prof, minmax, num_mouv+1 , NON , m);
+      minmax = relance_minimax(numBL ,numNO ,coul ,prof ,minmax ,m);
+      remplis_case (li, co ,ancPiece);
+      remplis_case(lipr,copr,piecepr);
+      remplis_case(liar,coar, RIEN);
+      return minmax;
     }
 
 /* --La--recherche--des--deplacements--sans--prise------------------------------------------------------------------- */
@@ -1197,6 +1249,12 @@ int effectue_depl_avec_prise ( int li , int co , int piece , int coul , int lipr
 int cherche_depl_pion_sans_prise ( int li , int co , int coul , int numBL ,
                                    int numNO , int prof , int minmax , tmm m[ PROF ][ PRISE ] )
     {
+      int piece = T[li][co];
+      if(cases_vides(li, co, 1, coul, AVANT, DROITE))
+          minmax = effectue_depl_sans_prise( li, co, piece, coul, li+AVANT*coul, co+DROITE*coul, numBL, numNO, prof, minmax , m);
+      if(cases_vides(li, co, 1, coul, AVANT, GAUCHE))
+          minmax = effectue_depl_sans_prise( li, co, piece, coul, li+AVANT*coul, co+GAUCHE*coul, numBL, numNO, prof, minmax , m);
+      return minmax;
     }
 
 /* cherche_depl_dame_sans_prise part d'une dame de couleur coul en ( li , co ) et détermine à l'aide de cases_vides
@@ -1206,6 +1264,32 @@ int cherche_depl_pion_sans_prise ( int li , int co , int coul , int numBL ,
 int cherche_depl_dame_sans_prise ( int li , int co , int coul , int numBL ,
                                    int numNO , int prof , int minmax , tmm m[ PROF ][ PRISE ] )
     {
+      int dist = 0;
+      int piece = T[li][co];
+      while(cases_vides(li ,co , dist+1, coul, AVANT , GAUCHE)) {
+          dist++;
+          if(dist > 0)
+              minmax = effectue_depl_sans_prise(li, co, piece, coul, li+AVANT*coul*dist, co+GAUCHE*coul*dist, numBL, numNO, prof, minmax, m);
+      }
+      dist = 0;
+      while(cases_vides(li ,co , dist+1, coul, AVANT , DROITE)) {
+          dist++;
+          if(dist > 0)
+              minmax = effectue_depl_sans_prise(li, co, piece, coul, li+AVANT*coul*dist, co+DROITE*coul*dist, numBL, numNO, prof, minmax, m);
+      }
+      dist = 0;
+      while(cases_vides(li ,co , dist+1, coul, ARRIERE , GAUCHE)) {
+          dist++;
+          if(dist > 0)
+              minmax = effectue_depl_sans_prise(li, co, piece, coul, li+ARRIERE*coul*dist, co+GAUCHE*coul*dist, numBL, numNO, prof, minmax,m);
+      }
+      dist = 0;
+      while(cases_vides(li ,co , dist+1, coul, ARRIERE , DROITE)) {
+          dist++;
+          if(dist > 0)
+              minmax = effectue_depl_sans_prise(li, co, piece, coul, li+ARRIERE*coul*dist, co+DROITE*coul*dist, numBL, numNO, prof, minmax, m);
+      }
+      return minmax;
     }
 
 /* effectue_depl_sans_prise considère une pièce de couleur coul en ( li , co ) qui se déplace vers ( liar , coar )
@@ -1216,6 +1300,27 @@ int cherche_depl_dame_sans_prise ( int li , int co , int coul , int numBL ,
 int effectue_depl_sans_prise ( int li , int co , int piece , int coul , int liar , int coar ,
                                int numBL , int numNO , int prof , int minmax , tmm m[ PROF ][ PRISE ] )
     {
+      int changement = NON;
+      int oldPiece = piece;
+      T[li][co] = RIEN;
+      if( piece*coul == 1 && liar == (coul == BLANC ? N-1 : 0) ) {
+          piece = (coul == BLANC ? DameBL : DameNO);
+          changement = OUI;
+      }
+      T[liar][coar] = piece;
+      if(changement) {
+          if(coul == BLANC)
+              numBL = compte_pieces(coul);
+          else
+              numNO = compte_pieces(coul);
+      }
+      memo_local(MOUV_SANS_PRISE, prof , 0, li, co, oldPiece, liar, coar, piece, RIEN, RIEN, RIEN); // QUE FAUT IL METTRE DANS LIPR ET COPR QUAND PAS DE PRISE!!!!!
+      if(Verbeux_mouvements && prof < 2)
+          affiche(MOUV_SANS_PRISE, li, co, oldPiece, liar, coar, piece, RIEN ,RIEN, RIEN, prof);
+      minmax = relance_minimax(numBL ,numNO ,coul ,prof ,minmax ,m);
+      remplis_case (li, co ,oldPiece);
+      T[liar][coar] = RIEN;
+      return minmax;
     }
 
 /* --C--est--tout---------------------------------------------------------------------------------------------------- */
