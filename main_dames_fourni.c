@@ -768,6 +768,7 @@ void print_mouv ( tmm m[ PRISE ] , int indent )
      {
         int i, prise = 0;
 
+        if(m[0].piece != RIEN){
         for(i = 0; i < indent; i++)
             printf(" ");
         if (m[0].piece == PionBL)
@@ -778,6 +779,10 @@ void print_mouv ( tmm m[ PRISE ] , int indent )
           printf("Le mouvement de la dame blanche va\n");
         else if (m[0].piece == DameNO)
           printf("Le mouvement de la dame noire va\n");
+        }
+        else {
+            printf("Aucun mouvement");
+        }
 
         while(prise < PRISE && m[prise].piece != RIEN) // on sort si on a plus de mouvement avec la piece ou si fin du tableau
         {
@@ -796,6 +801,7 @@ void print_mouv ( tmm m[ PRISE ] , int indent )
           printf("\n");
           prise++;
       }
+      printf("\n");
     }
 
 /* --Les--fonctions--pour--tester--les--prises----------------------------------------------------------------------- */
@@ -862,9 +868,10 @@ int prise_possible_case ( int li , int co , int coul , int sens , int direct )
       }
       else// DameBL
       { // changer li<(N-2)
-        if(li>1 && li <(N-2) && co>1 && co<(N-2)) // Si on est dans La partie où on peut prendre
-          {
-            while(contenu_case((li+sens*coul),(co+coul*direct))==RIEN && li>1 && li<(N-2) && co>1 && co<(N-2)) // continue jusqu'à être au bord de la zone de prise
+        //if(li>=1 && li <=(N-1) && co>=1 && co<=(N-1)) // Si on est dans La partie où on peut prendre
+          //{
+
+            while(contenu_case((li+sens*coul),(co+coul*direct))==RIEN && (li+sens*coul)>1 && (li+sens*coul)<(N-1) && (co+coul*direct)>1 && (co+coul*direct)<(N-1)) // continue jusqu'à être au bord de la zone de prise
             {
               compteur=compteur+1;
               li=li+coul*sens;
@@ -878,7 +885,7 @@ int prise_possible_case ( int li , int co , int coul , int sens , int direct )
                 if(contenu_case((li+sens*coul),(co+coul*direct))==RIEN && (li<=(N-1) && li>=0 && co<=(N-1) && co>=0))   // vérifie la dernière case derrière le pion
                   return compteur;
               }
-          }
+          //}
         return 0;
       }
 }
